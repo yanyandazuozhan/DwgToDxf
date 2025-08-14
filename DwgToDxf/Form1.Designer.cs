@@ -28,13 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.BtnChooseFile = new System.Windows.Forms.Button();
+            this.btnConvert = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.SuspendLayout();
+            // 
+            // BtnChooseFile
+            // 
+            this.BtnChooseFile.Location = new System.Drawing.Point(25, 82);
+            this.BtnChooseFile.Name = "BtnChooseFile";
+            this.BtnChooseFile.Size = new System.Drawing.Size(94, 23);
+            this.BtnChooseFile.TabIndex = 0;
+            this.BtnChooseFile.Text = "选择文件";
+            this.BtnChooseFile.UseVisualStyleBackColor = true;
+            this.BtnChooseFile.Click += new System.EventHandler(this.BtnChooseFile_Click);
+            // 
+            // btnConvert
+            // 
+            this.btnConvert.Location = new System.Drawing.Point(408, 82);
+            this.btnConvert.Name = "btnConvert";
+            this.btnConvert.Size = new System.Drawing.Size(93, 23);
+            this.btnConvert.TabIndex = 1;
+            this.btnConvert.Text = "转换";
+            this.btnConvert.UseVisualStyleBackColor = true;
+            this.btnConvert.Click += new System.EventHandler(this.btnConvert_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(25, 34);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(485, 25);
+            this.textBox1.TabIndex = 2;
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(563, 176);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.btnConvert);
+            this.Controls.Add(this.BtnChooseFile);
+            this.Name = "Form1";
             this.Text = "Form1";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Button BtnChooseFile;
+        private System.Windows.Forms.Button btnConvert;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
