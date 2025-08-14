@@ -16,7 +16,7 @@ namespace DwgToDxf
         {
             InitializeComponent();
         }
-
+        string filePath = "";
         private void BtnChooseFile_Click(object sender, EventArgs e)
         {
             // 创建 OpenFileDialog 实例
@@ -36,7 +36,7 @@ namespace DwgToDxf
                 try
                 {
                     // 获取选择的文件路径
-                    string filePath = openFileDialog.FileName;
+                     filePath = openFileDialog.FileName;
 
                     // 在这里处理文件，例如读取内容
                     // string fileContent = File.ReadAllText(filePath);

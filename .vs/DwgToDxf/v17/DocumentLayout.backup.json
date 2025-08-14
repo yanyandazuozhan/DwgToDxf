@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\DWGTODXF\\DwgToDxf\\",
+  "WorkspaceRootPath": "D:\\liuyan\\project\\c#project\\DwgToDxf\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|d:\\dwgtodxf\\dwgtodxf\\dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|D:\\liuyan\\project\\c#project\\DwgToDxf\\dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|solutionrelative:dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|d:\\dwgtodxf\\dwgtodxf\\dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|d:\\liuyan\\project\\c#project\\dwgtodxf\\dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AF256D25-89B3-435E-A1F0-E0995BE96C07}|DwgToDxf\\DwgToDxf.csproj|solutionrelative:dwgtodxf\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -24,11 +24,11 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Form1.cs",
-              "DocumentMoniker": "D:\\DWGTODXF\\DwgToDxf\\DwgToDxf\\Form1.cs",
+              "DocumentMoniker": "D:\\liuyan\\project\\c#project\\DwgToDxf\\DwgToDxf\\Form1.cs",
               "RelativeDocumentMoniker": "DwgToDxf\\Form1.cs",
-              "ToolTip": "D:\\DWGTODXF\\DwgToDxf\\DwgToDxf\\Form1.cs*",
-              "RelativeToolTip": "DwgToDxf\\Form1.cs*",
-              "ViewState": "AgIAACYAAAAAAAAAAAApwDQAAAAIAAAAAAAAAA==",
+              "ToolTip": "D:\\liuyan\\project\\c#project\\DwgToDxf\\DwgToDxf\\Form1.cs",
+              "RelativeToolTip": "DwgToDxf\\Form1.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAlwDQAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-14T01:03:16.365Z",
               "EditorCaption": ""
@@ -37,10 +37,10 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Form1.cs [\u8BBE\u8BA1]",
-              "DocumentMoniker": "D:\\DWGTODXF\\DwgToDxf\\DwgToDxf\\Form1.cs",
+              "DocumentMoniker": "D:\\liuyan\\project\\c#project\\DwgToDxf\\DwgToDxf\\Form1.cs",
               "RelativeDocumentMoniker": "DwgToDxf\\Form1.cs",
-              "ToolTip": "D:\\DWGTODXF\\DwgToDxf\\DwgToDxf\\Form1.cs [\u8BBE\u8BA1]*",
-              "RelativeToolTip": "DwgToDxf\\Form1.cs [\u8BBE\u8BA1]*",
+              "ToolTip": "D:\\liuyan\\project\\c#project\\DwgToDxf\\DwgToDxf\\Form1.cs [\u8BBE\u8BA1]",
+              "RelativeToolTip": "DwgToDxf\\Form1.cs [\u8BBE\u8BA1]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-14T00:55:14.764Z",
               "EditorCaption": " [\u8BBE\u8BA1]"
