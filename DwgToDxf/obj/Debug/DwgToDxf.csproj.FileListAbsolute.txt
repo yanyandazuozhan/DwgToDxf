@@ -11,3 +11,15 @@ D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.pdb
 D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.exe.config
 D:\DWGTODXF\DwgToDxf\DwgToDxf\bin\Debug\netDxf.dll
 D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.Up2Date
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\bin\Debug\DwgToDxf.exe.config
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\bin\Debug\DwgToDxf.exe
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\bin\Debug\DwgToDxf.pdb
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.AssemblyReference.cache
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.exe.config
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.Form1.resources
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.Properties.Resources.resources
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.GenerateResource.cache
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.CoreCompileInputs.cache
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.Up2Date
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.exe
+D:\liuyan\project\c#project\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.pdb

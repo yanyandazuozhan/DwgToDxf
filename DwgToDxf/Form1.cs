@@ -1,15 +1,18 @@
 ﻿using netDxf;
 using netDxf.Entities;
+using netDxf.Tables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
+using static netDxf.Entities.HatchBoundaryPath;
+
 
 namespace DwgToDxf
 {
@@ -58,7 +61,7 @@ namespace DwgToDxf
 
         private void btnConvert_Click(object sender, EventArgs e)
         {
-            string path = "C:\\Users\\jack1\\Downloads\\404PS套料图-君正25900-7.dxf";
+            string path = "D:\\liuyan\\project\\cad\\input\\404PS套料图-君正25900-7.dxf";
             DxfDocument doc = DxfDocument.Load(path, new List<string> { @".\Support" });
 
             var result = doc.Entities.Polylines2D.Where(m => m.Vertexes.Count == 4 &&m.Linetype.Name== "CONTINUOUS").FirstOrDefault();
@@ -74,11 +77,92 @@ namespace DwgToDxf
 
             var finalresult = firstquery.Where(t => GetResult(t) == area);
 
-            Polyline2D firstpolyline = finalresult.FirstOrDefault();
+         //   Polyline2D firstpolyline = finalresult.FirstOrDefault();//符合周长=1344的某个多段线=>即某个单独图表
+            List<string> names=new List<string>();
+            foreach (var firstpolyline in finalresult)
+            {
+                DxfDocument demoDoc = new DxfDocument();
+                //获取该图像的范围
+                var gdbPlateMinX = firstpolyline.Vertexes.OrderBy(m => m.Position.X).FirstOrDefault().Position.X;
+                var gdbPlateMaxX = firstpolyline.Vertexes.OrderByDescending(m => m.Position.X).FirstOrDefault().Position.X;
+                var gdbPlateMinY = firstpolyline.Vertexes.OrderBy(m => m.Position.Y).FirstOrDefault().Position.Y;
+                var gdbPlateMaxY = firstpolyline.Vertexes.OrderByDescending(m => m.Position.Y).FirstOrDefault().Position.Y;
+                List<Polyline2D> all_polys = doc.Entities.Polylines2D.ToList();//poly2d
+
+                List<Text> txts = doc.Entities.Texts.ToList();
+                List<MText> mtxts = doc.Entities.MTexts.ToList();
+                
+
+                //多段线
+                foreach (var polyline2D in all_polys)
+                {
+                    for (int j = 0; j < polyline2D.Vertexes.Count; j++)
+                    {
+                        if (polyline2D.Vertexes[j].Position.X > gdbPlateMinX && polyline2D.Vertexes[j].Position.X < gdbPlateMaxX &&
+                            polyline2D.Vertexes[j].Position.Y > gdbPlateMinY && polyline2D.Vertexes[j].Position.Y < gdbPlateMaxY)
+                        {
+                            //bIsIn = true;
+                            Polyline2D lineclone = (Polyline2D)polyline2D.Clone();
+                            demoDoc.Entities.Add(lineclone);
+                        }
+                        else
+                        {
+                            //bIsIn = false;
+                            //break;
+                        }
+                    }
+                }
+                List<Text> targetTXTContents = new List<Text>();//origin
+                List<string> targetTXTContents_clone = new List<string>();//clone
+                                                                          //文字
 
 
-                             
- 
+            // 在循环外部提前创建支持中文的文本样式
+            // 在循环外部创建中文字体样式
+            // 确保使用系统中已安装的TrueType中文字体
+
+
+                 foreach (var text in txts)
+                 {
+               
+              
+                     if (text.Position.X > gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y > gdbPlateMinY && text.Position.Y < gdbPlateMaxY)
+                     {
+                             string con = text.Value;
+                             targetTXTContents.Add(text);//=>提取出这个图表的所有文字集合
+                             Text te = (Text)text.Clone();
+                         // 设置支持中文的字体
+                      
+                         demoDoc.Entities.Add(te);
+                     }
+                 }
+                 //求取目标方框的坐标范围=>提取出文字后用正则表达式匹配或者是上一个+1这种
+                 var tagetminX = gdbPlateMinX+354;
+                 var tagetminY = gdbPlateMinY+254;//计算图表
+              
+                 var tagetmaxX = gdbPlateMaxX+383;
+                 var tagetmaxY = gdbPlateMaxY+262;//计算图标
+              
+                 foreach (var text in targetTXTContents)
+                 {
+                     //if判断坐标区间
+                     if (text.Position.X > tagetminX && text.Position.X < tagetmaxX && text.Position.Y > tagetminY && text.Position.Y < tagetmaxY&& text.Value.Contains("404PS"))
+                     { 
+                             string m= text.Value;
+                             names.Add(m);
+                     }
+                 }
+              
+              
+                 string b = "";
+           
+      
+         
+            demoDoc.Save("text.dxf");
+                //MessageBox.Show("结束");
+            }
+
+            string a2 = "";
         }
 
         public double GetResult(Polyline2D result)
