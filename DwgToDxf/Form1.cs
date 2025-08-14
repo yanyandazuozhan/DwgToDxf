@@ -1,15 +1,23 @@
 ﻿using netDxf;
 using netDxf.Entities;
+using netDxf.Header;
+using netDxf.Tables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
+using static netDxf.Entities.HatchBoundaryPath;
 using static System.Net.Mime.MediaTypeNames;
+using Line = netDxf.Entities.Line;
+using Text = netDxf.Entities.Text;
 
 namespace DwgToDxf
 {
@@ -73,12 +81,47 @@ namespace DwgToDxf
                              select n;
 
             var finalresult = firstquery.Where(t => GetResult(t) == area);
+            var entityStats = doc.Entities.All
+          .GroupBy(e1 => e1.Type)  // 按 EntityType 枚举分组
+          .Select(g => new { Type = g.Key, Count = g.Count() });
 
-            Polyline2D firstpolyline = finalresult.FirstOrDefault();
+            foreach (var stat in entityStats)
+            {
+                Console.WriteLine($"{stat.Type} : {stat.Count}");
+            }
+            var outputdir = "C:\\Users\\jack1\\Documents\\DXF文件";
 
+            DxfDocument newDxfFile1 = new DxfDocument();
+            foreach (TextStyle style in doc.TextStyles)
+            {
+                if (!newDxfFile1.TextStyles.Contains(style.Name))
+                {
+                    newDxfFile1.TextStyles.Add((TextStyle)style.Clone());
+                }
+            }
 
-                             
- 
+            foreach (var item in finalresult)
+            {
+                var text = FindText(doc, item);
+                Console.WriteLine(  text);
+            }
+           
+            int x = 0;
+            foreach (var item in finalresult)
+            {
+                x++;
+                DxfDocument newDxfFile = new DxfDocument();
+
+                var newdxf = AddElements(doc, item, newDxfFile);
+                string file = "test" + x + ".dxf";
+                var filename = Path.Combine(outputdir, file);
+                newdxf.Save(filename);
+            }
+
+            
+            //newDxfFile.Save("test.dxf");
+            MessageBox.Show("success");
+
         }
 
         public double GetResult(Polyline2D result)
@@ -95,6 +138,208 @@ namespace DwgToDxf
             return area;    
         }
 
-        
+        public string FindText(DxfDocument doc, Polyline2D polyline2D)
+        {
+            string retext = "";
+            List<Text>list = new List<Text>();
+            var gdbPlateMinX = polyline2D.Vertexes.OrderBy(m => m.Position.X).FirstOrDefault().Position.X;
+            var gdbPlateMaxX = polyline2D.Vertexes.OrderByDescending(m => m.Position.X).FirstOrDefault().Position.X;
+            var gdbPlateMinY = polyline2D.Vertexes.OrderBy(m => m.Position.Y).FirstOrDefault().Position.Y;
+            var gdbPlateMaxY = polyline2D.Vertexes.OrderByDescending(m => m.Position.Y).FirstOrDefault().Position.Y;
+            foreach (Text text in doc.Entities.Texts)
+            {
+                var firstpoint = doc.Entities.Texts.Where(i => i.Value == "招商精灵(扬州)").OrderBy(m => m.Position.X).FirstOrDefault();
+                if (text.Position.X >= gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y >= gdbPlateMinY && text.Position.Y <= gdbPlateMaxY)
+                {
+                    if(text.Value=="分道")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        list.Add(text);
+                    }
+                
+
+
+                }
+
+             
+            }
+
+            var sortedTexts = list
+      .OrderByDescending(t => t.Position.Y)
+      .ThenBy(t => t.Position.X)
+      .ToList();
+            var table = new List<List<string>>();
+
+
+            // 初始化第一行
+            var currentRow = new List<string> { sortedTexts[0].Value };
+            double currentY = sortedTexts[0].Position.Y;
+
+            // 遍历剩余文本进行分组
+            for (int i = 1; i < sortedTexts.Count; i++)
+            {
+                var text = sortedTexts[i];
+                // 判断是否和当前行在同一行（Y坐标差异在容差范围内）
+                if (Math.Abs(text.Position.Y - currentY) <= 0)
+                {
+                    currentRow.Add(text.Value);
+                }
+                else
+                {
+                    // 新行
+                    table.Add(currentRow);
+                    currentRow = new List<string> { text.Value };
+                    currentY = text.Position.Y;
+                }
+            }
+
+            // 添加最后一行
+            table.Add(currentRow);
+            //Console.WriteLine(table[1].Last());
+            retext = table[1].Last();
+            return retext;
+        }
+     
+        public DxfDocument AddElements(DxfDocument doc, Polyline2D polyline2D,DxfDocument newDxfFile)
+        {
+
+
+            var gdbPlateMinX = polyline2D.Vertexes.OrderBy(m => m.Position.X).FirstOrDefault().Position.X;
+            var gdbPlateMaxX = polyline2D.Vertexes.OrderByDescending(m => m.Position.X).FirstOrDefault().Position.X;
+            var gdbPlateMinY = polyline2D.Vertexes.OrderBy(m => m.Position.Y).FirstOrDefault().Position.Y;
+            var gdbPlateMaxY = polyline2D.Vertexes.OrderByDescending(m => m.Position.Y).FirstOrDefault().Position.Y;
+            foreach (TextStyle style in doc.TextStyles)
+            {
+                if (!newDxfFile.TextStyles.Contains(style.Name))
+                {
+                    newDxfFile.TextStyles.Add((TextStyle)style.Clone());
+                }
+            }
+            foreach (var item in doc.Entities.All)
+            {
+
+
+                if (item is Polyline2D)
+                {
+                    Polyline2D line = (Polyline2D)item;
+
+                    for (int i = 0; i < line.Vertexes.Count; i++)
+                    {
+                        if (line.Vertexes[i].Position.X >= gdbPlateMinX && line.Vertexes[i].Position.X <= gdbPlateMaxX &&
+                  line.Vertexes[i].Position.Y >= gdbPlateMinY && line.Vertexes[i].Position.Y <= gdbPlateMaxY)
+                        {
+                            Polyline2D cloned = (Polyline2D)line.Clone();
+                            newDxfFile.Entities.Add(cloned);
+
+                        }
+
+
+                    }
+
+
+
+                }
+
+                if (item is netDxf.Entities.Text)
+                {
+                    netDxf.Entities.Text text = (netDxf.Entities.Text)item;
+                    if (text.Position.X >= gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y >= gdbPlateMinY && text.Position.Y <= gdbPlateMaxY)
+                    {
+                        netDxf.Entities.Text cloned = (netDxf.Entities.Text)text.Clone();
+                        //cloned.Style =new TextStyle(,)
+
+                        newDxfFile.Entities.Add(cloned);
+
+                    }
+                }
+
+                if (item is Dimension)
+                {
+
+                    Dimension dimension = (Dimension)item;
+                   
+                    if (dimension is AlignedDimension)
+                    {
+                        AlignedDimension alignedDimension = (AlignedDimension)dimension;
+                        var f1 = alignedDimension.FirstReferencePoint;
+                        var f2 = alignedDimension.SecondReferencePoint;
+                  
+                        if (f1.X >= gdbPlateMinX && f1.X < gdbPlateMaxX && f1.Y >= gdbPlateMinY && f1.Y <= gdbPlateMaxY &&
+                            f2.X >= gdbPlateMinX && f2.X < gdbPlateMaxX && f2.Y >= gdbPlateMinY && f2.Y <= gdbPlateMaxY)
+                        {
+                            AlignedDimension cloned = (AlignedDimension)alignedDimension.Clone();
+                            cloned.TextPositionManuallySet = true;
+                            cloned.FirstReferencePoint = f1;
+                            cloned.SecondReferencePoint = f2;
+                            Console.WriteLine(cloned.UserText);
+                            newDxfFile.Entities.Add(cloned);
+
+                        }
+                    }
+
+                }
+                if (item is MText)
+                {
+                    netDxf.Entities.MText text = (netDxf.Entities.MText)item;
+                    if (text.Position.X >= gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y >= gdbPlateMinY && text.Position.Y <= gdbPlateMaxY)
+                    {
+                        netDxf.Entities.MText cloned = (netDxf.Entities.MText)text.Clone();
+                        newDxfFile.Entities.Add(cloned);
+
+                    }
+                }
+                if (item is Line)
+                {
+                    Line line = (Line)item;
+                    if (line.StartPoint.X >= gdbPlateMinX && line.StartPoint.X <= gdbPlateMaxX &&
+                   line.StartPoint.Y >= gdbPlateMinY && line.StartPoint.Y <= gdbPlateMaxY &&
+                   line.EndPoint.X >= gdbPlateMinX && line.EndPoint.X <= gdbPlateMaxX &&
+                   line.EndPoint.Y >= gdbPlateMinY && line.EndPoint.Y <= gdbPlateMaxY)
+                    {
+                        Line cloned = (Line)line.Clone();
+                        newDxfFile.Entities.Add(cloned);
+                    }
+
+                }
+                if (item is Solid)
+                {
+                    Solid solid = (Solid)item;
+                    Vector2 v1 = solid.FirstVertex;
+                    Vector2 v2 = solid.SecondVertex;
+                    Vector2 v3 = solid.ThirdVertex;
+                    Vector2 v4 = solid.FourthVertex;
+                    if (v1.X >= gdbPlateMinX && v1.X <= gdbPlateMaxX && v1.Y <= gdbPlateMaxY && v1.Y >= gdbPlateMinY &&
+                        v2.X >= gdbPlateMinX && v2.X <= gdbPlateMaxX && v2.Y <= gdbPlateMaxY && v2.Y >= gdbPlateMinY &&
+                        v3.X >= gdbPlateMinX && v3.X <= gdbPlateMaxX && v3.Y <= gdbPlateMaxY && v3.Y >= gdbPlateMinY &&
+                        v4.X >= gdbPlateMinX && v4.X <= gdbPlateMaxX && v4.Y <= gdbPlateMaxY && v4.Y >= gdbPlateMinY)
+                    {
+                        Solid s = (Solid)solid.Clone();
+                        newDxfFile.Entities.Add(s);
+                    }
+                }
+                if (item is Circle)
+                {
+                    Circle circle = (Circle)item;
+                    if (circle.Center.X >= gdbPlateMinX && circle.Center.X <= gdbPlateMaxX &&
+                    circle.Center.Y >= gdbPlateMinY && circle.Center.Y <= gdbPlateMaxY)
+                    {
+                        Circle ci = (Circle)circle.Clone();
+                        newDxfFile.Entities.Add(ci);
+                    }
+
+
+
+                }
+            }
+
+            return newDxfFile;
+        }
+            
+
+            
+
     }
 }
