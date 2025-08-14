@@ -1,4 +1,6 @@
-﻿using System;
+﻿using netDxf;
+using netDxf.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DwgToDxf
 {
@@ -55,7 +58,43 @@ namespace DwgToDxf
 
         private void btnConvert_Click(object sender, EventArgs e)
         {
+            string path = "C:\\Users\\jack1\\Downloads\\404PS套料图-君正25900-7.dxf";
+            DxfDocument doc = DxfDocument.Load(path, new List<string> { @".\Support" });
 
+            var result = doc.Entities.Polylines2D.Where(m => m.Vertexes.Count == 4 &&m.Linetype.Name== "CONTINUOUS").FirstOrDefault();
+            double area = 0;
+            if (result != null)
+            {
+                area=GetResult(result);
+
+            }
+            var firstquery = from n in doc.Entities.Polylines2D
+                             where n.Vertexes.Count == 4 && n.Linetype.Name == "CONTINUOUS"
+                             select n;
+
+            var finalresult = firstquery.Where(t => GetResult(t) == area);
+
+            Polyline2D firstpolyline = finalresult.FirstOrDefault();
+
+
+                             
+ 
         }
+
+        public double GetResult(Polyline2D result)
+        {
+            double area = 0;
+            var minX = result.Vertexes.OrderBy(m => m.Position.X).FirstOrDefault().Position.X;
+            var maxX = result.Vertexes.OrderByDescending(m => m.Position.X).FirstOrDefault().Position.X;
+            var minY = result.Vertexes.OrderBy(m => m.Position.Y).FirstOrDefault().Position.Y;
+            var maxY = result.Vertexes.OrderByDescending(m => m.Position.Y).FirstOrDefault().Position.Y;
+
+            double dx = maxX - minX;
+            double dy = maxY - minY;
+            area = Math.Round((dx + dy) * 2);
+            return area;    
+        }
+
+        
     }
 }

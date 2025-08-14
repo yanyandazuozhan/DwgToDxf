@@ -9,3 +9,5 @@ D:\DWGTODXF\DwgToDxf\DwgToDxf\bin\Debug\DwgToDxf.pdb
 D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.exe
 D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.pdb
 D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.exe.config
+D:\DWGTODXF\DwgToDxf\DwgToDxf\bin\Debug\netDxf.dll
+D:\DWGTODXF\DwgToDxf\DwgToDxf\obj\Debug\DwgToDxf.csproj.Up2Date
