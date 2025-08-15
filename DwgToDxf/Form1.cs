@@ -67,7 +67,7 @@ namespace DwgToDxf
         public TextStyle textStyle { get; set; }
         private void btnConvert_Click(object sender, EventArgs e)
         {
-            string path = "C:\\Users\\jack1\\Downloads\\404PS套料图-君正25900-7.dxf";
+            string path = "D:\\liuyan\\project\\cad\\input\\404PS套料图-君正25900-7.dxf";
             DxfDocument doc = DxfDocument.Load(path, new List<string> { @".\Support" });
 
             var result = doc.Entities.Polylines2D.Where(m => m.Vertexes.Count == 4 &&m.Linetype.Name== "CONTINUOUS").FirstOrDefault();
@@ -90,7 +90,7 @@ namespace DwgToDxf
             {
                 Console.WriteLine($"{stat.Type} : {stat.Count}");
             }
-            var outputdir = "C:\\Users\\jack1\\Documents\\DXF文件";
+            var outputdir = "D:\\liuyan\\project\\cad\\output\\dxfs";
 
             DxfDocument newDxfFile1 = new DxfDocument();
 
@@ -116,12 +116,30 @@ namespace DwgToDxf
                 DxfDocument newDxfFile = new DxfDocument();
 
                 var newdxf = AddElements(doc, item, newDxfFile);
-                string file = FindText(doc, item);  
-                var filename = Path.Combine(outputdir, file+".dxf");
-                newdxf.Save(filename);
+                string file = FindText(doc, item);
+
+                // 基础文件名（不含扩展名）
+                string baseFileName = file;
+                // 完整路径（初始值）
+                string fileName = Path.Combine(outputdir, $"{baseFileName}.dxf");
+
+                // 计数器，用于生成唯一文件名
+                int counter = 1;
+
+                // 检查文件是否存在，如果存在则添加"_1"后缀并重试
+                while (File.Exists(fileName))
+                {
+                    // 生成新的文件名，如"file_1.dxf"、"file_1_1.dxf"等
+                    fileName = Path.Combine(outputdir, $"{baseFileName}_1.dxf");
+                    baseFileName = $"{baseFileName}_1"; // 更新基础文件名，以便下一次循环继续添加后缀
+                    counter++;
+                }
+
+                // 保存文件
+                newdxf.Save(fileName);
             }
 
-            
+
             //newDxfFile.Save("test.dxf");
             MessageBox.Show("success");
 
