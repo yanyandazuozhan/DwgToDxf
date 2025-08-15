@@ -10,6 +10,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,7 +64,7 @@ namespace DwgToDxf
             }
         
         }
-
+        public TextStyle textStyle { get; set; }
         private void btnConvert_Click(object sender, EventArgs e)
         {
             string path = "C:\\Users\\jack1\\Downloads\\404PS套料图-君正25900-7.dxf";
@@ -92,6 +93,8 @@ namespace DwgToDxf
             var outputdir = "C:\\Users\\jack1\\Documents\\DXF文件";
 
             DxfDocument newDxfFile1 = new DxfDocument();
+
+            textStyle = doc.TextStyles.Where(m => m.Name.Contains("宋")).FirstOrDefault();
             foreach (TextStyle style in doc.TextStyles)
             {
                 if (!newDxfFile1.TextStyles.Contains(style.Name))
@@ -100,11 +103,11 @@ namespace DwgToDxf
                 }
             }
 
-            foreach (var item in finalresult)
-            {
-                var text = FindText(doc, item);
-                Console.WriteLine(  text);
-            }
+            //foreach (var item in finalresult)
+            //{
+            //    var text = FindText(doc, item);
+            //    Console.WriteLine(  text);
+            //}
            
             int x = 0;
             foreach (var item in finalresult)
@@ -113,8 +116,8 @@ namespace DwgToDxf
                 DxfDocument newDxfFile = new DxfDocument();
 
                 var newdxf = AddElements(doc, item, newDxfFile);
-                string file = "test" + x + ".dxf";
-                var filename = Path.Combine(outputdir, file);
+                string file = FindText(doc, item);  
+                var filename = Path.Combine(outputdir, file+".dxf");
                 newdxf.Save(filename);
             }
 
@@ -142,64 +145,74 @@ namespace DwgToDxf
         {
             string retext = "";
             List<Text>list = new List<Text>();
+            var txts = doc.Entities.Texts;
+
+
             var gdbPlateMinX = polyline2D.Vertexes.OrderBy(m => m.Position.X).FirstOrDefault().Position.X;
             var gdbPlateMaxX = polyline2D.Vertexes.OrderByDescending(m => m.Position.X).FirstOrDefault().Position.X;
             var gdbPlateMinY = polyline2D.Vertexes.OrderBy(m => m.Position.Y).FirstOrDefault().Position.Y;
             var gdbPlateMaxY = polyline2D.Vertexes.OrderByDescending(m => m.Position.Y).FirstOrDefault().Position.Y;
-            foreach (Text text in doc.Entities.Texts)
+            foreach (var text in txts)
             {
-                var firstpoint = doc.Entities.Texts.Where(i => i.Value == "招商精灵(扬州)").OrderBy(m => m.Position.X).FirstOrDefault();
-                if (text.Position.X >= gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y >= gdbPlateMinY && text.Position.Y <= gdbPlateMaxY)
+
+
+                if (text.Position.X > gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y > gdbPlateMinY && text.Position.Y < gdbPlateMaxY)
                 {
-                    if(text.Value=="分道")
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        list.Add(text);
-                    }
-                
+                    string con = text.Value;
+                    list.Add(text);//=>提取出这个图表的所有文字集合
 
-
-                }
-
-             
-            }
-
-            var sortedTexts = list
-      .OrderByDescending(t => t.Position.Y)
-      .ThenBy(t => t.Position.X)
-      .ToList();
-            var table = new List<List<string>>();
-
-
-            // 初始化第一行
-            var currentRow = new List<string> { sortedTexts[0].Value };
-            double currentY = sortedTexts[0].Position.Y;
-
-            // 遍历剩余文本进行分组
-            for (int i = 1; i < sortedTexts.Count; i++)
-            {
-                var text = sortedTexts[i];
-                // 判断是否和当前行在同一行（Y坐标差异在容差范围内）
-                if (Math.Abs(text.Position.Y - currentY) <= 0)
-                {
-                    currentRow.Add(text.Value);
-                }
-                else
-                {
-                    // 新行
-                    table.Add(currentRow);
-                    currentRow = new List<string> { text.Value };
-                    currentY = text.Position.Y;
                 }
             }
+            //求取目标方框的坐标范围=>提取出文字后用正则表达式匹配或者是上一个+1这种
+            var tagetminX = gdbPlateMinX + 354;
+            var tagetminY = gdbPlateMinY + 254;//计算图表
 
-            // 添加最后一行
-            table.Add(currentRow);
-            //Console.WriteLine(table[1].Last());
-            retext = table[1].Last();
+            var tagetmaxX = gdbPlateMaxX + 383;
+            var tagetmaxY = gdbPlateMaxY + 262;//计算图标
+
+            foreach (var text in list)
+            {
+                //if判断坐标区间
+                if (text.Position.X > tagetminX && text.Position.X < tagetmaxX && text.Position.Y > tagetminY && text.Position.Y < tagetmaxY && text.Value.Contains("404PS"))
+                {
+                    retext = text.Value;
+                  
+                }
+            }
+         
+            //      var sortedTexts = list
+            //.OrderByDescending(t => t.Position.Y)
+            //.ThenBy(t => t.Position.X)
+            //.ToList();
+            //      var table = new List<List<string>>();
+
+
+            //      // 初始化第一行
+            //      var currentRow = new List<string> { sortedTexts[0].Value };
+            //      double currentY = sortedTexts[0].Position.Y;
+
+            //      // 遍历剩余文本进行分组
+            //      for (int i = 1; i < sortedTexts.Count; i++)
+            //      {
+            //          var text = sortedTexts[i];
+            //          // 判断是否和当前行在同一行（Y坐标差异在容差范围内）
+            //          if (Math.Abs(text.Position.Y - currentY) <= 0)
+            //          {
+            //              currentRow.Add(text.Value);
+            //          }
+            //          else
+            //          {
+            //              // 新行
+            //              table.Add(currentRow);
+            //              currentRow = new List<string> { text.Value };
+            //              currentY = text.Position.Y;
+            //          }
+            //      }
+
+            //      // 添加最后一行
+            //      table.Add(currentRow);
+            //      //Console.WriteLine(table[1].Last());
+            //      retext = table[1].Last();
             return retext;
         }
      
@@ -249,38 +262,38 @@ namespace DwgToDxf
                     if (text.Position.X >= gdbPlateMinX && text.Position.X < gdbPlateMaxX && text.Position.Y >= gdbPlateMinY && text.Position.Y <= gdbPlateMaxY)
                     {
                         netDxf.Entities.Text cloned = (netDxf.Entities.Text)text.Clone();
-                        //cloned.Style =new TextStyle(,)
+                        cloned.Style = textStyle;
 
                         newDxfFile.Entities.Add(cloned);
 
                     }
                 }
 
-                if (item is Dimension)
-                {
+                //if (item is Dimension)
+                //{
 
-                    Dimension dimension = (Dimension)item;
+                //    Dimension dimension = (Dimension)item;
                    
-                    if (dimension is AlignedDimension)
-                    {
-                        AlignedDimension alignedDimension = (AlignedDimension)dimension;
-                        var f1 = alignedDimension.FirstReferencePoint;
-                        var f2 = alignedDimension.SecondReferencePoint;
+                //    if (dimension is AlignedDimension)
+                //    {
+                //        AlignedDimension alignedDimension = (AlignedDimension)dimension;
+                //        var f1 = alignedDimension.FirstReferencePoint;
+                //        var f2 = alignedDimension.SecondReferencePoint;
                   
-                        if (f1.X >= gdbPlateMinX && f1.X < gdbPlateMaxX && f1.Y >= gdbPlateMinY && f1.Y <= gdbPlateMaxY &&
-                            f2.X >= gdbPlateMinX && f2.X < gdbPlateMaxX && f2.Y >= gdbPlateMinY && f2.Y <= gdbPlateMaxY)
-                        {
-                            AlignedDimension cloned = (AlignedDimension)alignedDimension.Clone();
-                            cloned.TextPositionManuallySet = true;
-                            cloned.FirstReferencePoint = f1;
-                            cloned.SecondReferencePoint = f2;
-                            Console.WriteLine(cloned.UserText);
-                            newDxfFile.Entities.Add(cloned);
+                //        if (f1.X >= gdbPlateMinX && f1.X < gdbPlateMaxX && f1.Y >= gdbPlateMinY && f1.Y <= gdbPlateMaxY &&
+                //            f2.X >= gdbPlateMinX && f2.X < gdbPlateMaxX && f2.Y >= gdbPlateMinY && f2.Y <= gdbPlateMaxY)
+                //        {
+                //            AlignedDimension cloned = (AlignedDimension)alignedDimension.Clone();
+                //            cloned.TextPositionManuallySet = true;
+                //            cloned.FirstReferencePoint = f1;
+                //            cloned.SecondReferencePoint = f2;
+                //            Console.WriteLine(cloned.UserText);
+                //            newDxfFile.Entities.Add(cloned);
 
-                        }
-                    }
+                //        }
+                //    }
 
-                }
+                //}
                 if (item is MText)
                 {
                     netDxf.Entities.MText text = (netDxf.Entities.MText)item;
